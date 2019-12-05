@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { BaseController } from "./baseController";
+import { Route, Get, Query, Post, Body, Controller } from "tsoa";
 
 // TODO: Move the Workflow entity to a class then: import Workflow from '../models/workflow';
 // TODO: use something like diskbd to use this JSON as a local database
@@ -47,32 +48,41 @@ const workflows = [{
     ]
 }];
 
-class WorkflowController extends BaseController {
-
-    public static getAll = async (req: Request, res: Response) => {
-        res.ok(workflows);
+@Route("workflows")
+export class WorkflowController extends Controller {
+    @Get()
+    public async getAll(): Promise<any[]> {
+        return [ ...workflows];
     }
 
-    public static getById = async (req: Request, res: Response) => {
-        res.ok(workflows.find((t) => t.id === req.params.workflow_id));
+    @Get("{workflowId}")
+    public async getById(workflowId: string): Promise<any> {
+        return workflows.find((t) => t.id === workflowId);
     }
 
-    public static createRule = async (req: Request, res: Response) => {
-        const workflowToUpdate = workflows.find((t) => t.id === req.params.wokflow_id);
-        res.ok(workflowToUpdate);
+    @Post()
+    public async createState(@Body() stateDto: StateDTO): Promise<any> {
+        const workflowToUpdate = workflows.find((t) => t.id === stateDto.wokflowId);
+        workflowToUpdate.states.push(stateDto.state);
+        return workflowToUpdate;
     }
 
-    public static createState = async (req: Request, res: Response) => {
-        const workflowToUpdate = workflows.find((t) => t.id === req.params.wokflow_id);
-        workflowToUpdate.states.push(req.body.state);
-        res.ok(workflowToUpdate);
-    }
+    // public async createRule(req: Request, res: Response) {
+    //     const workflowToUpdate = workflows.find((t) => t.id === req.params.wokflow_id);
+    //     res.ok(workflowToUpdate);
+    // }
 
-    public static createTransition = async (req: Request, res: Response) => {
-        const workflowToUpdate = workflows.find((t) => t.id === req.params.wokflow_id);
-        workflowToUpdate.transitions.push(req.body.state);
-        res.ok(workflowToUpdate);
-    }
+    
+
+    // public static createTransition = async (req: Request, res: Response) => {
+    //     const workflowToUpdate = workflows.find((t) => t.id === req.params.wokflow_id);
+    //     workflowToUpdate.transitions.push(req.body.state);
+    //     res.ok(workflowToUpdate);
+    // }
 
 }
-export default WorkflowController;
+
+export interface StateDTO {
+   wokflowId: string;
+   state: string;
+}

@@ -1,7 +1,6 @@
 import express from "express";
 import * as swaggerUi from "swagger-ui-express";
 import { RegisterRoutes } from "./routers/routes";
-import workflowsRouter from "./routers/workflowRouter";
 
 const app = express();
 // TODO: Move midlewares setup to separate files under middlewares folder
@@ -18,7 +17,7 @@ try {
     console.log("Unable to load swagger.json", err);
 }
 
-app.use("/api/workflows", workflowsRouter);
+// app.use("/api/workflows", workflowsRouter);
 
 // Export express instance
 export default app;
